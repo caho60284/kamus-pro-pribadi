@@ -2,99 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Vocab Ultra</title>
 
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{margin:0;background:#f4f6fb}
+body{margin:0;background:#f5f7fb}
 
-header{background:#fff;padding:16px;position:sticky;top:0;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-h1{margin:0;font-size:24px}
+header{
+position:sticky;top:0;background:#fff;padding:16px;
+box-shadow:0 2px 6px rgba(0,0,0,.08);z-index:10
+}
+
+h1{margin:0;font-size:22px}
 .count{font-size:14px;color:#666;margin-top:4px}
 
-.controls{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
-button{border:none;border-radius:10px;padding:10px 14px;font-size:14px;color:#fff;cursor:pointer}
+.controls{
+display:flex;gap:10px;margin-top:10px;flex-wrap:wrap
+}
+
+button{
+border:none;padding:10px 14px;border-radius:10px;
+font-size:14px;color:#fff;cursor:pointer
+}
 
 .import{background:#1e88e5}
 .export{background:#6a5acd}
-.delete{background:#e53935}
-.fav{background:#f39c12}
+.deleteall{background:#e53935}
+.favbtn{background:#f39c12}
 .refresh{background:#27ae60}
-.add{background:#d6eaf8;color:#333}
+.add{background:#e3f2fd;color:#000}
 
-.search{margin-top:10px}
-.search input{
-width:100%;
-padding:12px;
-border-radius:10px;
-border:1px solid #ccc;
-font-size:16px;
+.search{
+width:100%;margin-top:10px;padding:12px;
+border-radius:10px;border:1px solid #ccc;
+font-size:16px
 }
 
-main{padding:14px}
+main{padding:16px}
 
 .card{
-background:#fff;
-border-radius:14px;
-padding:14px;
+background:#fff;border-radius:14px;padding:14px;
 margin-bottom:12px;
-box-shadow:0 2px 4px rgba(0,0,0,.05)
+display:flex;justify-content:space-between;
+align-items:flex-start
 }
 
-.word{
-font-weight:700;
-font-size:18px;
-display:flex;
-justify-content:space-between;
-align-items:center
+.word{font-weight:700;font-size:18px}
+.pron{color:#555;margin-top:2px}
+.meaning{
+color:#444;margin-top:4px;
+white-space:normal;      /* ✅ FIX meaning wrap */
+word-break:break-word
 }
 
-.star{cursor:pointer;font-size:20px;color:#ccc}
-.star.active{color:#f1c40f}
+.icons span{
+font-size:20px;margin-right:6px;cursor:pointer
+}
 
-.pron{color:#555;margin-top:4px;word-break:break-word}
-.meaning{color:#333;margin-top:4px}
+.star{
+font-size:22px;cursor:pointer
+}
 
-.icons{margin-top:6px}
-.icons span{font-size:20px;margin-right:10px;cursor:pointer}
+.star.on{color:#f5b301}
+.star.off{color:#ccc}
 
 .modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.4);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:20
+position:fixed;inset:0;background:rgba(0,0,0,.4);
+display:none;align-items:center;justify-content:center;
+z-index:99
 }
 
 .modal-content{
-background:#fff;
-width:92%;
-max-width:420px;
-border-radius:14px;
-padding:14px;
-max-height:90vh;
-overflow:auto
+background:#fff;width:92%;max-width:420px;
+padding:16px;border-radius:14px;
+max-height:90vh;overflow:auto
 }
 
 .modal-content input{
-width:100%;
-padding:10px;
-border-radius:8px;
-border:1px solid #ccc;
-margin-bottom:8px;
-font-size:15px
+width:100%;margin-bottom:8px;padding:10px;
+border-radius:8px;border:1px solid #ccc
 }
 
-.modal-actions{display:flex;gap:10px;margin-top:10px}
-.modal-actions button{flex:1}
-
-.save{background:#1e88e5}
-.del{background:#e53935}
-.cancel{background:#bbb}
-.audio{background:#27ae60}
+.row{display:flex;gap:8px;margin-top:8px}
+.green{background:#2ecc71;color:#fff;flex:1}
+.blue{background:#1e88e5;color:#fff;flex:1}
+.red{background:#e53935;color:#fff;flex:1}
+.gray{background:#bbb;color:#fff;flex:1}
 </style>
 </head>
 
@@ -107,21 +101,21 @@ font-size:15px
 <div class="controls">
 <button class="import" onclick="importCSV()">📥 Import</button>
 <button class="export" onclick="exportCSV()">📤 Export</button>
-<button class="delete" onclick="deleteAll()">🧨 Delete All</button>
-<button class="fav" onclick="toggleFavView()">⭐ Favorites</button>
+<button class="deleteall" onclick="deleteAll()">🧨 Delete All</button>
+<button class="favbtn" onclick="showFav()">⭐ Favorites</button>
 <button class="refresh" onclick="resetView()">🔄</button>
 <button class="add" onclick="openModal()">＋</button>
 </div>
 
-<div class="search">
-<input id="search" placeholder="Search word or meaning..." oninput="render()">
-</div>
+<input class="search" id="search" placeholder="Search word or meaning..." oninput="render()">
 </header>
 
 <main id="list"></main>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
 <div class="modal-content">
+
 <input id="word" placeholder="Word">
 <input id="pron" placeholder="Pronunciation">
 <input id="meaning" placeholder="Meaning">
@@ -134,107 +128,113 @@ font-size:15px
 <input id="ipa2" placeholder="IPA Example 2">
 <input id="tr2" placeholder="Translation 2">
 
-<div class="modal-actions">
-<button class="audio" onclick="speakEx1()">🔊 Ex1</button>
-<button class="audio" onclick="speakEx2()">🔊 Ex2</button>
+<div class="row">
+<button class="green" onclick="speakEx1()">🔊 Ex1</button>
+<button class="green" onclick="speakEx2()">🔊 Ex2</button>
 </div>
 
-<div class="modal-actions">
-<button class="save" onclick="save()">Save</button>
-<button class="del" onclick="remove()">Delete</button>
-<button class="cancel" onclick="closeModal()">Cancel</button>
+<div class="row">
+<button class="blue" onclick="save()">Save</button>
+<button class="red" onclick="remove()">Delete</button>
+<button class="gray" onclick="closeModal()">Cancel</button>
 </div>
+
 </div>
 </div>
 
 <script>
-let data=JSON.parse(localStorage.getItem("vocabUltra")||"[]");
-
-/* NORMALIZE OLD DATA */
-data=data.map(v=>({
-word:v.word||"",
-pron:v.pron||"",
-meaning:v.meaning||"",
-ex1:v.ex1||"",
-ipa1:v.ipa1||"",
-tr1:v.tr1||"",
-ex2:v.ex2||"",
-ipa2:v.ipa2||"",
-tr2:v.tr2||"",
-fav:v.fav===true
-}));
-
-let editIndex=null;
-let favOnly=false;
+let data = JSON.parse(localStorage.getItem("vocabUltra")||"[]")
+let editIndex=null
+let showOnlyFav=false
 
 function render(){
-const list=document.getElementById("list");
-const q=document.getElementById("search").value.toLowerCase();
+const list=document.getElementById("list")
+list.innerHTML=""
 
-list.innerHTML="";
-let shown=0;
+const q=document.getElementById("search").value.toLowerCase()
 
-data.forEach((v,i)=>{
-if(favOnly && v.fav!==true) return;
+let filtered=data.filter(v=>{
+if(showOnlyFav && !v.fav) return false
+return (
+v.word?.toLowerCase().includes(q) ||
+v.meaning?.toLowerCase().includes(q)
+)
+})
 
-if(q && !(
-v.word.toLowerCase().includes(q)||
-v.meaning.toLowerCase().includes(q)
-)) return;
+document.getElementById("count").innerText=`Total vocabulary: ${filtered.length} words`
 
-shown++;
+filtered.forEach(v=>{
+const i=data.indexOf(v)
 
-const d=document.createElement("div");
-d.className="card";
+const d=document.createElement("div")
+d.className="card"
 
 d.innerHTML=`
-<div class="word">
-${v.word}
-<span class="star ${v.fav===true?'active':''}" onclick="toggleFav(${i})">⭐</span>
-</div>
-<div class="pron">${v.pron}</div>
-<div class="meaning">${v.meaning}</div>
+<div>
+<div class="word">${v.word||""}</div>
+<div class="pron">${v.pron||""}</div>
+<div class="meaning">${v.meaning||""}</div>
 <div class="icons">
-<span onclick="play('${v.word}')">🔊</span>
+<span onclick="playWord('${v.word}')">🔊</span>
 <span onclick="playSlow('${v.word}')">🐢</span>
 <span onclick="edit(${i})">✏️</span>
 </div>
-`;
+</div>
 
-list.appendChild(d);
-});
+<div>
+<span class="star ${v.fav?'on':'off'}" onclick="toggleFav(${i})">★</span>
+</div>
+`
+list.appendChild(d)
+})
 
-document.getElementById("count").innerText=`Total vocabulary: ${shown} words`;
-localStorage.setItem("vocabUltra",JSON.stringify(data));
+localStorage.setItem("vocabUltra",JSON.stringify(data))
+}
+
+function toggleFav(i){
+data[i].fav=!data[i].fav
+render()
+}
+
+function showFav(){
+showOnlyFav=true
+render()
+}
+
+function resetView(){
+showOnlyFav=false
+document.getElementById("search").value=""
+render()
 }
 
 function openModal(){
-editIndex=null;
-word.value=pron.value=meaning.value="";
-ex1.value=ipa1.value=tr1.value="";
-ex2.value=ipa2.value=tr2.value="";
-modal.style.display="flex";
+editIndex=null
+word.value=pron.value=meaning.value=""
+ex1.value=ipa1.value=tr1.value=""
+ex2.value=ipa2.value=tr2.value=""
+modal.style.display="flex"
 }
 
-function closeModal(){modal.style.display="none"}
-
 function edit(i){
-editIndex=i;
-const v=data[i];
-word.value=v.word;
-pron.value=v.pron;
-meaning.value=v.meaning;
-ex1.value=v.ex1;
-ipa1.value=v.ipa1;
-tr1.value=v.tr1;
-ex2.value=v.ex2;
-ipa2.value=v.ipa2;
-tr2.value=v.tr2;
-modal.style.display="flex";
+editIndex=i
+const v=data[i]
+
+word.value=v.word||""
+pron.value=v.pron||""
+meaning.value=v.meaning||""
+
+ex1.value=v.ex1||""
+ipa1.value=v.ipa1||""
+tr1.value=v.tr1||""
+
+ex2.value=v.ex2||""
+ipa2.value=v.ipa2||""
+tr2.value=v.tr2||""
+
+modal.style.display="flex"
 }
 
 function save(){
-if(!word.value.trim()) return;
 const v={
 word:word.value,
 pron:pron.value,
@@ -245,111 +245,103 @@ tr1:tr1.value,
 ex2:ex2.value,
 ipa2:ipa2.value,
 tr2:tr2.value,
-fav: editIndex!==null?data[editIndex].fav:false
-};
+fav: editIndex!==null ? data[editIndex].fav : false
+}
 
-if(editIndex===null) data.push(v);
-else data[editIndex]=v;
+if(editIndex===null) data.push(v)
+else data[editIndex]=v
 
-closeModal();
-render();
+closeModal()
+render()
 }
 
 function remove(){
 if(editIndex!==null){
-data.splice(editIndex,1);
-closeModal();
-render();
+data.splice(editIndex,1)
+closeModal()
+render()
 }
-}
-
-function toggleFav(i){
-data[i].fav=!data[i].fav;
-render();
-}
-
-function toggleFavView(){
-favOnly=!favOnly;
-render();
-}
-
-function resetView(){
-favOnly=false;
-document.getElementById("search").value="";
-render();
 }
 
 function deleteAll(){
 if(confirm("Delete all vocabulary?")){
-data=[];
-render();
+data=[]
+render()
 }
 }
 
-function play(t){
-speechSynthesis.speak(new SpeechSynthesisUtterance(t));
+function closeModal(){
+modal.style.display="none"
+}
+
+function playWord(t){
+speechSynthesis.speak(new SpeechSynthesisUtterance(t))
 }
 
 function playSlow(t){
-let u=new SpeechSynthesisUtterance(t);
-u.rate=0.55;
-speechSynthesis.speak(u);
+let u=new SpeechSynthesisUtterance(t)
+u.rate=0.6
+speechSynthesis.speak(u)
 }
 
 function speakEx1(){
-if(ex1.value) speechSynthesis.speak(new SpeechSynthesisUtterance(ex1.value));
+if(ex1.value) speechSynthesis.speak(new SpeechSynthesisUtterance(ex1.value))
 }
 
 function speakEx2(){
-if(ex2.value) speechSynthesis.speak(new SpeechSynthesisUtterance(ex2.value));
+if(ex2.value) speechSynthesis.speak(new SpeechSynthesisUtterance(ex2.value))
 }
 
 function exportCSV(){
-let csv="word,pronunciation,meaning,example1,ipa1,translation1,example2,ipa2,translation2,fav\n";
+let csv="word,pronunciation,meaning,example1,ipa1,translation1,example2,ipa2,translation2,favorite\n"
 data.forEach(v=>{
-csv+=`"${v.word}","${v.pron}","${v.meaning}","${v.ex1}","${v.ipa1}","${v.tr1}","${v.ex2}","${v.ipa2}","${v.tr2}","${v.fav}"\n`;
-});
-const a=document.createElement("a");
-a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-a.download="my-vocab-ultra.csv";
-a.click();
+csv+=`"${v.word||""}","${v.pron||""}","${v.meaning||""}","${v.ex1||""}","${v.ipa1||""}","${v.tr1||""}","${v.ex2||""}","${v.ipa2||""}","${v.tr2||""}","${v.fav?1:0}"\n`
+})
+
+const a=document.createElement("a")
+a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}))
+a.download="my-vocab-ultra.csv"
+a.click()
 }
 
 function importCSV(){
-const i=document.createElement("input");
-i.type="file";
-i.accept=".csv";
+const i=document.createElement("input")
+i.type="file"
+i.accept=".csv"
 i.onchange=e=>{
-const r=new FileReader();
+const r=new FileReader()
 r.onload=()=>{
-const lines=r.result.split(/\r?\n/).filter(l=>l.trim());
-data=[];
+const lines=r.result.split(/\r?\n/).filter(l=>l.trim())
+data=[]
+
 lines.forEach((line,idx)=>{
-if(idx===0) return;
-const c=line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-if(!c) return;
+if(idx===0) return
+const c=line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)
+if(!c) return
+
 data.push({
-word:(c[0]||"").replace(/"/g,""),
-pron:(c[1]||"").replace(/"/g,""),
-meaning:(c[2]||"").replace(/"/g,""),
-ex1:(c[3]||"").replace(/"/g,""),
-ipa1:(c[4]||"").replace(/"/g,""),
-tr1:(c[5]||"").replace(/"/g,""),
-ex2:(c[6]||"").replace(/"/g,""),
-ipa2:(c[7]||"").replace(/"/g,""),
-tr2:(c[8]||"").replace(/"/g,""),
-fav:(c[9]||"false").replace(/"/g,"")==="true"
-});
-});
-render();
-};
-r.readAsText(e.target.files[0]);
-};
-i.click();
+word:c[0]?.replace(/"/g,""),
+pron:c[1]?.replace(/"/g,""),
+meaning:c[2]?.replace(/"/g,""),
+ex1:c[3]?.replace(/"/g,""),
+ipa1:c[4]?.replace(/"/g,""),
+tr1:c[5]?.replace(/"/g,""),
+ex2:c[6]?.replace(/"/g,""),
+ipa2:c[7]?.replace(/"/g,""),
+tr2:c[8]?.replace(/"/g,""),
+fav:c[9]==="1"
+})
+})
+
+render()
+alert("Import success")
+}
+r.readAsText(e.target.files[0])
+}
+i.click()
 }
 
-render();
+render()
 </script>
-
 </body>
 </html>
