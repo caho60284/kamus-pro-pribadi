@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>My Vocab Ultra</title>
 
 <style>
@@ -10,7 +10,9 @@
 body{margin:0;background:#f5f7fb}
 
 header{
-position:sticky;top:0;background:#fff;
+position:sticky;
+top:0;
+background:#fff;
 padding:16px;
 box-shadow:0 2px 6px rgba(0,0,0,.08);
 z-index:10
@@ -19,7 +21,12 @@ z-index:10
 h1{margin:0 0 6px;font-size:22px}
 .count{font-size:14px;color:#666}
 
-.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.controls{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:10px
+}
 
 button{
 border:none;
@@ -31,9 +38,10 @@ cursor:pointer
 
 .import{background:#1e88e5;color:#fff}
 .export{background:#6a5acd;color:#fff}
-.deleteAll{background:#e53935;color:#fff}
-.favBtn{background:#ff9800;color:#fff}
-.add{background:#e3f2fd;font-size:22px;width:44px}
+.deleteall{background:#e53935;color:#fff}
+.favbtn{background:#ff9800;color:#fff}
+.refresh{background:#26a69a;color:#fff}
+.add{background:#e3f2fd;font-size:22px}
 
 .search{
 margin-top:10px;
@@ -41,7 +49,7 @@ width:100%;
 padding:10px;
 border-radius:10px;
 border:1px solid #ccc;
-font-size:16px;
+font-size:16px
 }
 
 main{padding:16px}
@@ -50,17 +58,23 @@ main{padding:16px}
 background:#fff;
 border-radius:14px;
 padding:14px;
-margin-bottom:12px;
+margin-bottom:12px
 }
 
 .word{font-weight:700;font-size:18px}
-.pron{color:#555;margin-top:2px}
-.meaning{color:#444;margin-top:4px}
+.pron{color:#555;font-style:italic;margin-top:2px}
+.meaning{color:#444;margin-top:2px}
 
 .icons{margin-top:6px}
-.icons span{font-size:20px;margin-right:8px;cursor:pointer}
+.icons span{
+font-size:20px;
+margin-right:10px;
+cursor:pointer
+}
 
-/* MODAL FIX */
+.star{font-size:20px;cursor:pointer}
+
+/* MODAL — sama seperti versi stabil */
 .modal{
 position:fixed;
 inset:0;
@@ -68,19 +82,18 @@ background:rgba(0,0,0,.4);
 display:none;
 align-items:center;
 justify-content:center;
-z-index:999;
-padding:14px;
+z-index:99;
+padding:env(safe-area-inset-top) 12px 12px
 }
 
 .modal-content{
 background:#fff;
 width:100%;
-max-width:520px;
-border-radius:18px;
+max-width:420px;
 padding:16px;
-max-height:calc(100vh - 40px);
-overflow:auto;
-padding-bottom:calc(24px + env(safe-area-inset-bottom));
+border-radius:14px;
+max-height:90vh;
+overflow:auto
 }
 
 .modal-content input,
@@ -90,14 +103,19 @@ margin-bottom:8px;
 padding:10px;
 border-radius:8px;
 border:1px solid #ccc;
-font-size:16px;
+font-size:16px
 }
 
-.modal-actions{display:flex;gap:10px;margin-top:10px}
-.save{background:#1e88e5;color:#fff;flex:1}
-.delete{background:#e53935;color:#fff;flex:1}
-.cancel{background:#bbb;flex:1}
-.audio{background:#2ecc71;color:#fff;flex:1}
+.modal-actions{
+display:flex;
+gap:10px;
+margin-top:10px
+}
+
+.green{background:#2ecc71;color:#fff;flex:1}
+.blue{background:#1e88e5;color:#fff;flex:1}
+.red{background:#e53935;color:#fff;flex:1}
+.gray{background:#bbb;flex:1}
 </style>
 </head>
 
@@ -110,17 +128,17 @@ font-size:16px;
 <div class="controls">
 <button class="import" onclick="importCSV()">📥 Import</button>
 <button class="export" onclick="exportCSV()">📤 Export</button>
-<button class="deleteAll" onclick="deleteAll()">🧨 Delete All</button>
-<button class="favBtn" onclick="toggleFavorites()">⭐ Favorites</button>
+<button class="deleteall" onclick="deleteAll()">🧨 Delete All</button>
+<button class="favbtn" onclick="toggleFavorites()">⭐ Favorites</button>
+<button class="refresh" onclick="refreshList()">🔄 Refresh</button>
 <button class="add" onclick="openModal()">＋</button>
 </div>
 
-<input class="search" id="search" placeholder="Search...">
+<input class="search" id="search" placeholder="Search..." oninput="render()">
 </header>
 
 <main id="list"></main>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
 <div class="modal-content">
 
@@ -137,76 +155,87 @@ font-size:16px;
 <textarea id="tr2" placeholder="Translation 2"></textarea>
 
 <div class="modal-actions">
-<button class="audio" onclick="speakEx1()">🔊 Ex1</button>
-<button class="audio" onclick="speakEx2()">🔊 Ex2</button>
+<button class="green" onclick="playExample1()">🔊 Ex1</button>
+<button class="green" onclick="playExample2()">🔊 Ex2</button>
 </div>
 
 <div class="modal-actions">
-<button class="save" onclick="save()">Save</button>
-<button class="delete" onclick="remove()">Delete</button>
-<button class="cancel" onclick="closeModal()">Cancel</button>
+<button class="blue" onclick="save()">Save</button>
+<button class="red" onclick="remove()">Delete</button>
+<button class="gray" onclick="closeModal()">Cancel</button>
 </div>
 
 </div>
 </div>
 
 <script>
-let data = JSON.parse(localStorage.getItem("vocabUltra") || "[]");
-let editIndex = null;
-let showFav = false;
+let data=JSON.parse(localStorage.getItem("vocabUltra")||"[]")
+let editIndex=null
+let showFav=false
 
 function render(){
-const list=document.getElementById("list");
-const q=document.getElementById("search").value.toLowerCase();
+const list=document.getElementById("list")
+list.innerHTML=""
+const q=document.getElementById("search").value.toLowerCase()
 
-list.innerHTML="";
 let filtered=data.filter(v=>{
-return (
-(!showFav || v.fav) &&
-(
-v.word?.toLowerCase().includes(q) ||
-v.meaning?.toLowerCase().includes(q)
-)
-)
-});
+if(showFav && !v.fav) return false
+return v.word.toLowerCase().includes(q) || v.meaning.toLowerCase().includes(q)
+})
 
 document.getElementById("count").innerText=
-`Total vocabulary: ${data.length} words`;
+`Total vocabulary: ${data.length} words`
 
-filtered.forEach((v,i)=>{
-const realIndex=data.indexOf(v);
-
-const d=document.createElement("div");
-d.className="card";
+filtered.forEach(v=>{
+const i=data.indexOf(v)
+const d=document.createElement("div")
+d.className="card"
 d.innerHTML=`
-<div class="word">${v.word||""}</div>
-<div class="pron">${v.pron||""}</div>
-<div class="meaning">${v.meaning||""}</div>
+<div class="word">${v.word}</div>
+<div class="pron">${v.pron}</div>
+<div class="meaning">${v.meaning}</div>
 
 <div class="icons">
-<span onclick="play('${v.word}')">🔊</span>
+<span onclick="playWord('${v.word}')">🔊</span>
 <span onclick="playSlow('${v.word}')">🐢</span>
-<span onclick="edit(${realIndex})">✏️</span>
-<span onclick="toggleFav(${realIndex})">${v.fav?"⭐":"☆"}</span>
-</div>
-`;
-list.appendChild(d);
-});
+<span onclick="edit(${i})">✏️</span>
+<span class="star" onclick="toggleStar(${i})">${v.fav?"⭐":"☆"}</span>
+</div>`
+list.appendChild(d)
+})
 
-localStorage.setItem("vocabUltra", JSON.stringify(data));
+localStorage.setItem("vocabUltra",JSON.stringify(data))
+}
+
+/* ===== REFRESH — FITUR BARU SAJA ===== */
+function refreshList(){
+document.getElementById("search").value=""
+showFav=false
+render()
+}
+
+function toggleFavorites(){
+showFav=!showFav
+render()
+}
+
+function toggleStar(i){
+data[i].fav=!data[i].fav
+render()
 }
 
 function openModal(){
-editIndex=null;
-word.value=pron.value=meaning.value="";
-ex1.value=ipa1.value=tr1.value="";
-ex2.value=ipa2.value=tr2.value="";
-modal.style.display="flex";
+editIndex=null
+word.value=pron.value=meaning.value=""
+ex1.value=ipa1.value=tr1.value=""
+ex2.value=ipa2.value=tr2.value=""
+modal.style.display="flex"
 }
 
 function closeModal(){modal.style.display="none"}
 
 function save(){
+if(!word.value.trim()) return
 const v={
 word:word.value,
 pron:pron.value,
@@ -217,122 +246,109 @@ tr1:tr1.value,
 ex2:ex2.value,
 ipa2:ipa2.value,
 tr2:tr2.value,
-fav:false
-};
-
-if(editIndex===null) data.push(v);
-else data[editIndex]= {...data[editIndex],...v};
-
-closeModal();
-render();
+fav:data[editIndex]?.fav||false
+}
+if(editIndex===null)data.push(v)
+else data[editIndex]=v
+closeModal()
+render()
 }
 
 function edit(i){
-editIndex=i;
-const v=data[i];
-word.value=v.word||"";
-pron.value=v.pron||"";
-meaning.value=v.meaning||"";
-ex1.value=v.ex1||"";
-ipa1.value=v.ipa1||"";
-tr1.value=v.tr1||"";
-ex2.value=v.ex2||"";
-ipa2.value=v.ipa2||"";
-tr2.value=v.tr2||"";
-modal.style.display="flex";
+editIndex=i
+const v=data[i]
+word.value=v.word
+pron.value=v.pron
+meaning.value=v.meaning
+ex1.value=v.ex1
+ipa1.value=v.ipa1
+tr1.value=v.tr1
+ex2.value=v.ex2
+ipa2.value=v.ipa2
+tr2.value=v.tr2
+modal.style.display="flex"
 }
 
 function remove(){
-if(editIndex!==null && confirm("Delete?")){
-data.splice(editIndex,1);
-closeModal();
-render();
+if(editIndex!==null){
+data.splice(editIndex,1)
+closeModal()
+render()
 }
 }
 
 function deleteAll(){
-if(confirm("Delete ALL vocabulary?")){
-data=[];
-render();
+if(confirm("Delete all words?")){
+data=[]
+render()
 }
 }
 
-function toggleFav(i){
-data[i].fav=!data[i].fav;
-render();
-}
-
-function toggleFavorites(){
-showFav=!showFav;
-render();
-}
-
-function play(t){
-speechSynthesis.speak(new SpeechSynthesisUtterance(t));
+function playWord(t){
+speechSynthesis.speak(new SpeechSynthesisUtterance(t))
 }
 
 function playSlow(t){
-let u=new SpeechSynthesisUtterance(t);
-u.rate=0.55;
-speechSynthesis.speak(u);
+let u=new SpeechSynthesisUtterance(t)
+u.rate=0.5
+speechSynthesis.speak(u)
 }
 
-function speakEx1(){
-if(ex1.value) play(ex1.value);
+function playExample1(){
+if(ex1.value)
+speechSynthesis.speak(new SpeechSynthesisUtterance(ex1.value))
 }
 
-function speakEx2(){
-if(ex2.value) play(ex2.value);
+function playExample2(){
+if(ex2.value)
+speechSynthesis.speak(new SpeechSynthesisUtterance(ex2.value))
 }
 
 function exportCSV(){
-let csv="word,pronunciation,meaning,example1,ipa1,translation1,example2,ipa2,translation2\n";
+let csv="word,pronunciation,meaning,example1,ipa1,translation1,example2,ipa2,translation2\n"
 data.forEach(v=>{
-csv+=`"${v.word||""}","${v.pron||""}","${v.meaning||""}","${v.ex1||""}","${v.ipa1||""}","${v.tr1||""}","${v.ex2||""}","${v.ipa2||""}","${v.tr2||""}"\n`;
-});
-const a=document.createElement("a");
-a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-a.download="my-vocab-ultra.csv";
-a.click();
+csv+=`"${v.word}","${v.pron}","${v.meaning}","${v.ex1}","${v.ipa1}","${v.tr1}","${v.ex2}","${v.ipa2}","${v.tr2}"\n`
+})
+const a=document.createElement("a")
+a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}))
+a.download="vocab-ultra.csv"
+a.click()
 }
 
 function importCSV(){
-const i=document.createElement("input");
-i.type="file"; i.accept=".csv";
+const i=document.createElement("input")
+i.type="file"
+i.accept=".csv"
 i.onchange=e=>{
-const r=new FileReader();
+const r=new FileReader()
 r.onload=()=>{
-const lines=r.result.split(/\r?\n/).filter(l=>l.trim());
-data=[];
+const lines=r.result.split(/\r?\n/).filter(l=>l.trim())
+data=[]
 lines.forEach((line,idx)=>{
-if(idx===0) return;
-const cols=line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-if(!cols) return;
-
+if(idx===0)return
+const c=line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)
+if(!c)return
 data.push({
-word:cols[0]?.replace(/"/g,""),
-pron:cols[1]?.replace(/"/g,""),
-meaning:cols[2]?.replace(/"/g,""),
-ex1:cols[3]?.replace(/"/g,""),
-ipa1:cols[4]?.replace(/"/g,""),
-tr1:cols[5]?.replace(/"/g,""),
-ex2:cols[6]?.replace(/"/g,""),
-ipa2:cols[7]?.replace(/"/g,""),
-tr2:cols[8]?.replace(/"/g,""),
+word:(c[0]||"").replace(/"/g,""),
+pron:(c[1]||"").replace(/"/g,""),
+meaning:(c[2]||"").replace(/"/g,""),
+ex1:(c[3]||"").replace(/"/g,""),
+ipa1:(c[4]||"").replace(/"/g,""),
+tr1:(c[5]||"").replace(/"/g,""),
+ex2:(c[6]||"").replace(/"/g,""),
+ipa2:(c[7]||"").replace(/"/g,""),
+tr2:(c[8]||"").replace(/"/g,""),
 fav:false
-});
-});
-render();
-};
-r.readAsText(e.target.files[0]);
-};
-i.click();
+})
+})
+render()
+}
+r.readAsText(e.target.files[0])
+}
+i.click()
 }
 
-document.getElementById("search").addEventListener("input",render);
-
-render();
+render()
 </script>
-
 </body>
 </html>
