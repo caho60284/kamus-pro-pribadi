@@ -2,71 +2,73 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Vocab Ultra</title>
 
 <style>
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{margin:0;background:#f4f6fa}
+body{margin:0;background:#f4f6fb}
 
 header{
 position:sticky;top:0;background:#fff;
-padding:16px;box-shadow:0 2px 6px rgba(0,0,0,.1);z-index:10
+padding:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);
+z-index:10
 }
+h1{margin:0;font-size:22px}
+.count{font-size:14px;color:#666;margin-top:4px}
 
-h1{margin:0 0 6px}
-.count{font-size:14px;color:#666}
-
-.controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-button{border:none;padding:10px 14px;border-radius:10px;cursor:pointer}
-
-.import{background:#1e88e5;color:#fff}
-.export{background:#6a5acd;color:#fff}
-.deleteAll{background:#e53935;color:#fff}
-.showFav{background:#ff9800;color:#fff}
-.add{background:#e3f2fd;font-weight:bold}
+.controls{
+display:flex;gap:10px;margin-top:10px;flex-wrap:wrap
+}
+button{
+border:none;border-radius:10px;
+padding:10px 14px;font-size:14px;
+cursor:pointer;color:#fff
+}
+.import{background:#1e88e5}
+.export{background:#6a5acd}
+.deleteall{background:#e53935}
+.favbtn{background:#f39c12}
+.add{background:#e3f2fd;color:#000;font-size:22px}
 
 .search{
-width:100%;margin-top:10px;padding:10px;
-border-radius:10px;border:1px solid #ccc
+width:100%;margin-top:10px;
+padding:10px;border-radius:10px;border:1px solid #ccc
 }
 
-main{padding:16px}
+main{padding:14px}
 
 .card{
 background:#fff;border-radius:14px;
-padding:14px;margin-bottom:12px
+padding:14px;margin-bottom:10px;
+box-shadow:0 1px 4px rgba(0,0,0,.05)
 }
 
 .word{font-weight:700;font-size:18px}
-.pron{color:#666;font-style:italic}
-.meaning{margin-top:4px}
-.icons{margin-top:6px}
-.icons span{font-size:20px;margin-right:8px;cursor:pointer}
+.pron{color:#666;margin-top:2px}
+.meaning{color:#333;margin-top:4px}
 
-.starActive{color:#ff9800}
+.icons{margin-top:6px}
+.icons span{font-size:18px;margin-right:8px;cursor:pointer}
 
 .modal{
-position:fixed;inset:0;background:rgba(0,0,0,.4);
-display:none;align-items:center;justify-content:center
+position:fixed;inset:0;background:rgba(0,0,0,.35);
+display:none;align-items:center;justify-content:center;
+z-index:99
 }
-
-.modal-content{
-background:#fff;width:92%;max-width:420px;
-padding:16px;border-radius:14px;
-max-height:90vh;overflow:auto
+.modal-box{
+background:#fff;width:92%;max-width:380px;
+padding:16px;border-radius:14px
 }
-
-.modal-content input,textarea{
-width:100%;margin-bottom:8px;padding:10px;
-border-radius:8px;border:1px solid #ccc
+.modal-box input{
+width:100%;margin-bottom:8px;
+padding:10px;border-radius:8px;border:1px solid #ccc
 }
-
-.modal-actions{display:flex;gap:8px;margin-top:8px}
-.save{background:#1e88e5;color:#fff;flex:1}
-.delete{background:#e53935;color:#fff;flex:1}
-.cancel{background:#bbb;flex:1}
-.audioBtn{background:#2ecc71;color:#fff;flex:1}
+.row{display:flex;gap:10px;margin-top:10px}
+.green{background:#2ecc71;color:#fff;flex:1}
+.blue{background:#1e88e5;color:#fff;flex:1}
+.red{background:#e53935;color:#fff;flex:1}
+.gray{background:#bbb;color:#fff;flex:1}
 </style>
 </head>
 
@@ -74,13 +76,13 @@ border-radius:8px;border:1px solid #ccc
 
 <header>
 <h1>📘 My Vocab Ultra</h1>
-<div class="count" id="count"></div>
+<div class="count" id="count">Total vocabulary: 0 words</div>
 
 <div class="controls">
 <button class="import" onclick="importCSV()">📥 Import</button>
 <button class="export" onclick="exportCSV()">📤 Export</button>
-<button class="deleteAll" onclick="deleteAll()">🧨 Delete All</button>
-<button class="showFav" onclick="toggleFavFilter()">⭐ Favorites</button>
+<button class="deleteall" onclick="deleteAll()">🧨 Delete All</button>
+<button class="favbtn" onclick="toggleFav()">⭐ Favorites</button>
 <button class="add" onclick="openModal()">＋</button>
 </div>
 
@@ -90,90 +92,86 @@ border-radius:8px;border:1px solid #ccc
 <main id="list"></main>
 
 <div class="modal" id="modal">
-<div class="modal-content">
+<div class="modal-box">
 
 <input id="word" placeholder="Word">
-<input id="pron" placeholder="Pronunciation">
+<input id="pron" placeholder="IPA">
 <input id="meaning" placeholder="Meaning">
 
-<textarea id="ex1" placeholder="Example 1"></textarea>
+<input id="ex1" placeholder="Example 1">
 <input id="ipa1" placeholder="IPA Example 1">
-<textarea id="tr1" placeholder="Translation 1"></textarea>
+<input id="tr1" placeholder="Translation 1">
 
-<textarea id="ex2" placeholder="Example 2"></textarea>
+<input id="ex2" placeholder="Example 2">
 <input id="ipa2" placeholder="IPA Example 2">
-<textarea id="tr2" placeholder="Translation 2"></textarea>
+<input id="tr2" placeholder="Translation 2">
 
-<div class="modal-actions">
-<button class="audioBtn" onclick="speakExample1()">🔊 Ex1</button>
-<button class="audioBtn" onclick="speakExample2()">🔊 Ex2</button>
+<div class="row">
+<button class="green" onclick="speakEx1()">🔊 Ex1</button>
+<button class="green" onclick="speakEx2()">🔊 Ex2</button>
 </div>
 
-<div class="modal-actions">
-<button class="save" onclick="save()">Save</button>
-<button class="delete" onclick="remove()">Delete</button>
-<button class="cancel" onclick="closeModal()">Cancel</button>
+<div class="row">
+<button class="blue" onclick="save()">Save</button>
+<button class="red" onclick="remove()">Delete</button>
+<button class="gray" onclick="closeModal()">Cancel</button>
 </div>
 
 </div>
 </div>
 
 <script>
-let data=JSON.parse(localStorage.getItem("vocabUltra")||"[]");
+let data = JSON.parse(localStorage.getItem("ultraVocab")||"[]");
 let editIndex=null;
-let showFavorites=false;
+let favMode=false;
 
 function render(){
-let list=document.getElementById("list");
-let keyword=search.value.toLowerCase();
+const list=document.getElementById("list");
+const q=document.getElementById("search").value.toLowerCase();
 list.innerHTML="";
 
-let filtered=data.filter(v=>{
-let match=v.word.toLowerCase().includes(keyword)||
-(v.meaning||"").toLowerCase().includes(keyword);
-if(showFavorites) return match && v.favorite;
-return match;
-});
+let filtered=data.filter(v=>
+(!favMode||v.fav)&&(
+v.word.toLowerCase().includes(q)||
+v.meaning.toLowerCase().includes(q)
+));
 
-count.innerText=`Total vocabulary: ${data.length} words`;
+document.getElementById("count").innerText=`Total vocabulary: ${filtered.length} words`;
 
 filtered.forEach((v,i)=>{
-let realIndex=data.indexOf(v);
-let d=document.createElement("div");
-d.className="card";
-d.innerHTML=`
-<div class="word">
-${v.word}
-<span onclick="toggleFavorite(${realIndex})" 
-class="${v.favorite?'starActive':''}">⭐</span>
-</div>
+const idx=data.indexOf(v);
+
+const div=document.createElement("div");
+div.className="card";
+div.innerHTML=`
+<div class="word">${v.word||""}</div>
 <div class="pron">${v.pron||""}</div>
 <div class="meaning">${v.meaning||""}</div>
+
 <div class="icons">
-<span onclick="speakWord('${v.word}')">🔊</span>
-<span onclick="speakSlow('${v.word}')">🐢</span>
-<span onclick="edit(${realIndex})">✏️</span>
+<span onclick="play('${v.word}')">🔊</span>
+<span onclick="playSlow('${v.word}')">🐢</span>
+<span onclick="edit(${idx})">✏️</span>
+<span onclick="toggleStar(${idx})">${v.fav?"⭐":"☆"}</span>
 </div>
 `;
-list.appendChild(d);
+list.appendChild(div);
 });
 
-localStorage.setItem("vocabUltra",JSON.stringify(data));
+localStorage.setItem("ultraVocab",JSON.stringify(data));
 }
 
 function openModal(){
 editIndex=null;
-word.value=pron.value=meaning.value="";
-ex1.value=ipa1.value=tr1.value="";
+word.value=pron.value=meaning.value=
+ex1.value=ipa1.value=tr1.value=
 ex2.value=ipa2.value=tr2.value="";
 modal.style.display="flex";
 }
-
 function closeModal(){modal.style.display="none"}
 
 function save(){
-if(!word.value.trim()) return alert("Word required");
-let obj={
+const v={
 word:word.value,
 pron:pron.value,
 meaning:meaning.value,
@@ -183,17 +181,16 @@ tr1:tr1.value,
 ex2:ex2.value,
 ipa2:ipa2.value,
 tr2:tr2.value,
-favorite:false
+fav:false
 };
-if(editIndex===null)data.push(obj);
-else data[editIndex]=obj;
-closeModal();
-render();
+if(editIndex===null)data.push(v);
+else data[editIndex]=v;
+closeModal();render();
 }
 
 function edit(i){
 editIndex=i;
-let v=data[i];
+const v=data[i];
 word.value=v.word;
 pron.value=v.pron;
 meaning.value=v.meaning;
@@ -207,105 +204,92 @@ modal.style.display="flex";
 }
 
 function remove(){
-if(editIndex!==null && confirm("Delete?")){
+if(editIndex!==null&&confirm("Delete?")){
 data.splice(editIndex,1);
-closeModal();
-render();
+closeModal();render();
 }
 }
 
 function deleteAll(){
-if(confirm("Delete ALL?")){
-data=[];
-render();
+if(confirm("Delete ALL vocabulary?")){
+data=[];render();
 }
 }
 
-function toggleFavorite(i){
-data[i].favorite=!data[i].favorite;
+function toggleStar(i){
+data[i].fav=!data[i].fav;
+render();
+}
+function toggleFav(){
+favMode=!favMode;
 render();
 }
 
-function toggleFavFilter(){
-showFavorites=!showFavorites;
-render();
+function play(t){
+speechSynthesis.speak(new SpeechSynthesisUtterance(t));
 }
-
-function speakWord(t){
+function playSlow(t){
 let u=new SpeechSynthesisUtterance(t);
-u.rate=1;
+u.rate=0.6;
 speechSynthesis.speak(u);
 }
 
-function speakSlow(t){
-let u=new SpeechSynthesisUtterance(t);
-u.rate=0.45;   // LOCKED slow speed
-speechSynthesis.speak(u);
-}
-
-function speakExample1(){
+function speakEx1(){
 if(ex1.value){
-let u=new SpeechSynthesisUtterance(ex1.value);
-u.rate=1;
-speechSynthesis.speak(u);
+speechSynthesis.speak(new SpeechSynthesisUtterance(ex1.value));
 }
 }
-
-function speakExample2(){
+function speakEx2(){
 if(ex2.value){
-let u=new SpeechSynthesisUtterance(ex2.value);
-u.rate=1;
-speechSynthesis.speak(u);
+speechSynthesis.speak(new SpeechSynthesisUtterance(ex2.value));
 }
 }
 
 function exportCSV(){
-let csv="word,pronunciation,meaning,example1,ipaExample1,translation1,example2,ipaExample2,translation2\n";
+let csv="word,pronunciation,meaning,example1,ipa1,translation1,example2,ipa2,translation2\n";
 data.forEach(v=>{
 csv+=`"${v.word}","${v.pron}","${v.meaning}","${v.ex1}","${v.ipa1}","${v.tr1}","${v.ex2}","${v.ipa2}","${v.tr2}"\n`;
 });
-let a=document.createElement("a");
-a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8;"}));
+const a=document.createElement("a");
+a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
 a.download="my-vocab-ultra.csv";
 a.click();
 }
 
 function importCSV(){
-let input=document.createElement("input");
-input.type="file";
-input.accept=".csv";
-input.onchange=e=>{
-let r=new FileReader();
+const inp=document.createElement("input");
+inp.type="file";
+inp.accept=".csv";
+inp.onchange=e=>{
+const r=new FileReader();
 r.onload=()=>{
-let lines=r.result.split(/\r?\n/).filter(l=>l.trim());
+const lines=r.result.split(/\r?\n/).filter(l=>l.trim());
 data=[];
-lines.forEach((l,i)=>{
+lines.forEach((line,i)=>{
 if(i===0)return;
-let c=l.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+const c=line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 if(!c)return;
 data.push({
-word:c[0]?.replace(/"/g,""),
-pron:c[1]?.replace(/"/g,""),
-meaning:c[2]?.replace(/"/g,""),
-ex1:c[3]?.replace(/"/g,""),
-ipa1:c[4]?.replace(/"/g,""),
-tr1:c[5]?.replace(/"/g,""),
-ex2:c[6]?.replace(/"/g,""),
-ipa2:c[7]?.replace(/"/g,""),
-tr2:c[8]?.replace(/"/g,""),
-favorite:false
+word:(c[0]||"").replace(/"/g,""),
+pron:(c[1]||"").replace(/"/g,""),
+meaning:(c[2]||"").replace(/"/g,""),
+ex1:(c[3]||"").replace(/"/g,""),
+ipa1:(c[4]||"").replace(/"/g,""),
+tr1:(c[5]||"").replace(/"/g,""),
+ex2:(c[6]||"").replace(/"/g,""),
+ipa2:(c[7]||"").replace(/"/g,""),
+tr2:(c[8]||"").replace(/"/g,""),
+fav:false
 });
 });
 render();
-alert("Import sukses");
 };
 r.readAsText(e.target.files[0]);
 };
-input.click();
+inp.click();
 }
 
 render();
 </script>
-
 </body>
 </html>
