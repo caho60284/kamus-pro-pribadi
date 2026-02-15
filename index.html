@@ -2,59 +2,46 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>My Vocab Ultra</title>
 
 <style>
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-background:#f5f7fb;
-}
-
-/* 🔥 iOS ANTI ZOOM FIX */
-input{font-size:16px}
-textarea{font-size:16px}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{margin:0;background:#f5f7fb}
 
 header{
-position:sticky;
-top:0;
-background:#fff;
+position:sticky;top:0;background:#fff;
 padding:16px;
-box-shadow:0 2px 6px rgba(0,0,0,.1);
-z-index:10;
+box-shadow:0 2px 6px rgba(0,0,0,.08);
+z-index:10
 }
 
-h1{margin:0;font-size:24px}
-.count{color:#666;font-size:14px;margin-top:4px}
+h1{margin:0 0 6px;font-size:22px}
+.count{font-size:14px;color:#666}
 
-.controls{
-display:flex;
-gap:8px;
-margin-top:10px;
-flex-wrap:wrap
-}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 
 button{
 border:none;
-border-radius:10px;
 padding:10px 14px;
+border-radius:10px;
 font-size:14px;
 cursor:pointer
 }
 
 .import{background:#1e88e5;color:#fff}
 .export{background:#6a5acd;color:#fff}
-.deleteall{background:#e53935;color:#fff}
-.favbtn{background:#f39c12;color:#fff}
-.add{margin-left:auto;background:#e3f2fd;font-size:22px}
+.deleteAll{background:#e53935;color:#fff}
+.favBtn{background:#ff9800;color:#fff}
+.add{background:#e3f2fd;font-size:22px;width:44px}
 
-.search{margin-top:10px}
-.search input{
+.search{
+margin-top:10px;
 width:100%;
 padding:10px;
 border-radius:10px;
-border:1px solid #ccc
+border:1px solid #ccc;
+font-size:16px;
 }
 
 main{padding:16px}
@@ -63,19 +50,17 @@ main{padding:16px}
 background:#fff;
 border-radius:14px;
 padding:14px;
-margin-bottom:12px
+margin-bottom:12px;
 }
 
 .word{font-weight:700;font-size:18px}
-.pron{color:#555;font-style:italic}
-.meaning{color:#333;margin-top:4px}
+.pron{color:#555;margin-top:2px}
+.meaning{color:#444;margin-top:4px}
 
-.icons span{
-font-size:20px;
-margin-right:8px;
-cursor:pointer
-}
+.icons{margin-top:6px}
+.icons span{font-size:20px;margin-right:8px;cursor:pointer}
 
+/* MODAL FIX */
 .modal{
 position:fixed;
 inset:0;
@@ -83,33 +68,32 @@ background:rgba(0,0,0,.4);
 display:none;
 align-items:center;
 justify-content:center;
-z-index:99
+z-index:999;
+padding:14px;
 }
 
-.modalbox{
+.modal-content{
 background:#fff;
-width:92%;
-max-width:420px;
-border-radius:14px;
+width:100%;
+max-width:520px;
+border-radius:18px;
 padding:16px;
-max-height:90vh;
-overflow:auto
+max-height:calc(100vh - 40px);
+overflow:auto;
+padding-bottom:calc(24px + env(safe-area-inset-bottom));
 }
 
-.modalbox input{
+.modal-content input,
+.modal-content textarea{
 width:100%;
 margin-bottom:8px;
 padding:10px;
 border-radius:8px;
-border:1px solid #ccc
+border:1px solid #ccc;
+font-size:16px;
 }
 
-.modal-actions{
-display:flex;
-gap:8px;
-margin-top:10px
-}
-
+.modal-actions{display:flex;gap:10px;margin-top:10px}
 .save{background:#1e88e5;color:#fff;flex:1}
 .delete{background:#e53935;color:#fff;flex:1}
 .cancel{background:#bbb;flex:1}
@@ -126,36 +110,35 @@ margin-top:10px
 <div class="controls">
 <button class="import" onclick="importCSV()">📥 Import</button>
 <button class="export" onclick="exportCSV()">📤 Export</button>
-<button class="deleteall" onclick="deleteAll()">🧨 Delete All</button>
-<button class="favbtn" onclick="toggleFavMode()">⭐ Favorites</button>
+<button class="deleteAll" onclick="deleteAll()">🧨 Delete All</button>
+<button class="favBtn" onclick="toggleFavorites()">⭐ Favorites</button>
 <button class="add" onclick="openModal()">＋</button>
 </div>
 
-<div class="search">
-<input id="search" placeholder="Search..." oninput="render()">
-</div>
+<input class="search" id="search" placeholder="Search...">
 </header>
 
 <main id="list"></main>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
-<div class="modalbox">
+<div class="modal-content">
 
 <input id="word" placeholder="Word">
 <input id="pron" placeholder="Pronunciation">
 <input id="meaning" placeholder="Meaning">
 
-<input id="ex1" placeholder="Example 1">
+<textarea id="ex1" placeholder="Example 1"></textarea>
 <input id="ipa1" placeholder="IPA Example 1">
-<input id="tr1" placeholder="Translation 1">
+<textarea id="tr1" placeholder="Translation 1"></textarea>
 
-<input id="ex2" placeholder="Example 2">
+<textarea id="ex2" placeholder="Example 2"></textarea>
 <input id="ipa2" placeholder="IPA Example 2">
-<input id="tr2" placeholder="Translation 2">
+<textarea id="tr2" placeholder="Translation 2"></textarea>
 
 <div class="modal-actions">
-<button class="audio" onclick="playEx1()">🔊 Ex1</button>
-<button class="audio" onclick="playEx2()">🔊 Ex2</button>
+<button class="audio" onclick="speakEx1()">🔊 Ex1</button>
+<button class="audio" onclick="speakEx2()">🔊 Ex2</button>
 </div>
 
 <div class="modal-actions">
@@ -168,36 +151,34 @@ margin-top:10px
 </div>
 
 <script>
-let data=JSON.parse(localStorage.getItem("ultraVocab")||"[]");
-let editIndex=null;
-let favMode=false;
+let data = JSON.parse(localStorage.getItem("vocabUltra") || "[]");
+let editIndex = null;
+let showFav = false;
 
 function render(){
 const list=document.getElementById("list");
 const q=document.getElementById("search").value.toLowerCase();
+
 list.innerHTML="";
+let filtered=data.filter(v=>{
+return (
+(!showFav || v.fav) &&
+(
+v.word?.toLowerCase().includes(q) ||
+v.meaning?.toLowerCase().includes(q)
+)
+)
+});
 
-let display=data;
+document.getElementById("count").innerText=
+`Total vocabulary: ${data.length} words`;
 
-if(favMode){
-display=data.filter(v=>v.fav);
-}
+filtered.forEach((v,i)=>{
+const realIndex=data.indexOf(v);
 
-if(q){
-display=display.filter(v=>
-(v.word||"").toLowerCase().includes(q)||
-(v.meaning||"").toLowerCase().includes(q)
-);
-}
-
-document.getElementById("count").innerText=`Total vocabulary: ${data.length} words`;
-
-display.forEach(v=>{
-const i=data.indexOf(v);
-
-const div=document.createElement("div");
-div.className="card";
-div.innerHTML=`
+const d=document.createElement("div");
+d.className="card";
+d.innerHTML=`
 <div class="word">${v.word||""}</div>
 <div class="pron">${v.pron||""}</div>
 <div class="meaning">${v.meaning||""}</div>
@@ -205,29 +186,21 @@ div.innerHTML=`
 <div class="icons">
 <span onclick="play('${v.word}')">🔊</span>
 <span onclick="playSlow('${v.word}')">🐢</span>
-<span onclick="edit(${i})">✏️</span>
-<span onclick="toggleStar(${i})">${v.fav?"⭐":"☆"}</span>
+<span onclick="edit(${realIndex})">✏️</span>
+<span onclick="toggleFav(${realIndex})">${v.fav?"⭐":"☆"}</span>
 </div>
 `;
-list.appendChild(div);
+list.appendChild(d);
 });
 
-localStorage.setItem("ultraVocab",JSON.stringify(data));
-}
-
-function toggleFavMode(){
-favMode=!favMode;
-render();
-}
-
-function toggleStar(i){
-data[i].fav=!data[i].fav;
-render();
+localStorage.setItem("vocabUltra", JSON.stringify(data));
 }
 
 function openModal(){
 editIndex=null;
-document.querySelectorAll("#modal input").forEach(i=>i.value="");
+word.value=pron.value=meaning.value="";
+ex1.value=ipa1.value=tr1.value="";
+ex2.value=ipa2.value=tr2.value="";
 modal.style.display="flex";
 }
 
@@ -247,8 +220,8 @@ tr2:tr2.value,
 fav:false
 };
 
-if(editIndex===null)data.push(v);
-else data[editIndex]=v;
+if(editIndex===null) data.push(v);
+else data[editIndex]= {...data[editIndex],...v};
 
 closeModal();
 render();
@@ -257,7 +230,6 @@ render();
 function edit(i){
 editIndex=i;
 const v=data[i];
-
 word.value=v.word||"";
 pron.value=v.pron||"";
 meaning.value=v.meaning||"";
@@ -267,12 +239,11 @@ tr1.value=v.tr1||"";
 ex2.value=v.ex2||"";
 ipa2.value=v.ipa2||"";
 tr2.value=v.tr2||"";
-
 modal.style.display="flex";
 }
 
 function remove(){
-if(editIndex!==null){
+if(editIndex!==null && confirm("Delete?")){
 data.splice(editIndex,1);
 closeModal();
 render();
@@ -286,6 +257,16 @@ render();
 }
 }
 
+function toggleFav(i){
+data[i].fav=!data[i].fav;
+render();
+}
+
+function toggleFavorites(){
+showFav=!showFav;
+render();
+}
+
 function play(t){
 speechSynthesis.speak(new SpeechSynthesisUtterance(t));
 }
@@ -296,12 +277,12 @@ u.rate=0.55;
 speechSynthesis.speak(u);
 }
 
-function playEx1(){
-if(ex1.value) speechSynthesis.speak(new SpeechSynthesisUtterance(ex1.value));
+function speakEx1(){
+if(ex1.value) play(ex1.value);
 }
 
-function playEx2(){
-if(ex2.value) speechSynthesis.speak(new SpeechSynthesisUtterance(ex2.value));
+function speakEx2(){
+if(ex2.value) play(ex2.value);
 }
 
 function exportCSV(){
@@ -317,8 +298,7 @@ a.click();
 
 function importCSV(){
 const i=document.createElement("input");
-i.type="file";
-i.accept=".csv";
+i.type="file"; i.accept=".csv";
 i.onchange=e=>{
 const r=new FileReader();
 r.onload=()=>{
@@ -326,19 +306,19 @@ const lines=r.result.split(/\r?\n/).filter(l=>l.trim());
 data=[];
 lines.forEach((line,idx)=>{
 if(idx===0) return;
-const c=line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-if(!c) return;
+const cols=line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+if(!cols) return;
 
 data.push({
-word:(c[0]||"").replace(/"/g,""),
-pron:(c[1]||"").replace(/"/g,""),
-meaning:(c[2]||"").replace(/"/g,""),
-ex1:(c[3]||"").replace(/"/g,""),
-ipa1:(c[4]||"").replace(/"/g,""),
-tr1:(c[5]||"").replace(/"/g,""),
-ex2:(c[6]||"").replace(/"/g,""),
-ipa2:(c[7]||"").replace(/"/g,""),
-tr2:(c[8]||"").replace(/"/g,""),
+word:cols[0]?.replace(/"/g,""),
+pron:cols[1]?.replace(/"/g,""),
+meaning:cols[2]?.replace(/"/g,""),
+ex1:cols[3]?.replace(/"/g,""),
+ipa1:cols[4]?.replace(/"/g,""),
+tr1:cols[5]?.replace(/"/g,""),
+ex2:cols[6]?.replace(/"/g,""),
+ipa2:cols[7]?.replace(/"/g,""),
+tr2:cols[8]?.replace(/"/g,""),
 fav:false
 });
 });
@@ -348,6 +328,8 @@ r.readAsText(e.target.files[0]);
 };
 i.click();
 }
+
+document.getElementById("search").addEventListener("input",render);
 
 render();
 </script>
